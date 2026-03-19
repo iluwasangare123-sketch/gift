@@ -2,85 +2,54 @@
 <html lang="ar">
 <head>
 <meta charset="UTF-8">
-<title>🔥 Ultimate Gift Pro</title>
+<title>Ultimate Gift</title>
 
 <style>
 body {
     margin:0;
     font-family: Arial;
     text-align:center;
+    background:#111;
     color:white;
-    background: linear-gradient(270deg,#ff0040,#000,#ff7300);
-    background-size:600% 600%;
-    animation:bg 10s infinite;
-}
-
-@keyframes bg {
-    0%{background-position:0%}
-    50%{background-position:100%}
-    100%{background-position:0%}
 }
 
 .box {
     margin-top:80px;
-    background:rgba(0,0,0,0.5);
+    background:#222;
     padding:30px;
     border-radius:20px;
     display:inline-block;
-    backdrop-filter:blur(15px);
 }
 
-/* أزرار فخمة */
 button {
     padding:12px 25px;
     margin:10px;
     border:none;
-    border-radius:12px;
-    background:linear-gradient(45deg,#ff0040,#ff4b2b);
+    border-radius:10px;
+    background:#ff0040;
     color:white;
     cursor:pointer;
-    box-shadow:0 0 15px #ff0040;
-    transition:0.3s;
-}
-
-button:hover {
-    transform:scale(1.1);
-    box-shadow:0 0 30px #ff0040;
 }
 
 input,textarea {
     width:80%;
     padding:10px;
     margin:10px;
-    border:none;
     border-radius:10px;
-}
-
-/* قلوب */
-.heart {
-    position:absolute;
-    animation:float 4s linear infinite;
-}
-@keyframes float {
-    0%{transform:translateY(0);}
-    100%{transform:translateY(-800px);opacity:0;}
+    border:none;
 }
 </style>
 
 </head>
 <body>
 
-<audio id="music" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
-
-<!-- الصفحة الرئيسية -->
 <div id="home" class="box">
     <h1>🔥 Ultimate Gift</h1>
     <button onclick="goCreate()">إنشاء هدية</button>
 </div>
 
-<!-- الإنشاء -->
 <div id="create" class="box" style="display:none;">
-    <h2>🎁 إنشاء هدية</h2>
+    <h2>🎁 إنشاء</h2>
     <input id="sender" placeholder="اسمك"><br>
     <input id="receiver" placeholder="اسم المستلم"><br>
     <input id="pass" placeholder="كلمة سر"><br>
@@ -89,21 +58,59 @@ input,textarea {
     <div id="linkBox"></div>
 </div>
 
-<!-- العرض -->
 <div id="view" class="box" style="display:none;">
     <h2 id="title"></h2>
     <input id="passInput" placeholder="كلمة السر"><br>
     <button onclick="unlock()">🎀 فتح الهدية</button>
-    <div id="count"></div>
     <div id="content"></div>
 </div>
 
 <script>
 
-// انتقال
 function goCreate(){
     home.style.display="none";
     create.style.display="block";
+}
+
+function makeLink(){
+    let url = location.origin + location.pathname +
+    `?name=${receiver.value}&from=${sender.value}&msg=${encodeURIComponent(msg.value)}&pass=${pass.value}`;
+
+    linkBox.innerHTML = `<input value="${url}" style="width:90%" readonly>`;
+}
+
+// قراءة الرابط
+let params = new URLSearchParams(window.location.search);
+
+// تحقق صارم
+let name = params.get("name");
+let from = params.get("from");
+let msg = params.get("msg");
+let pass = params.get("pass");
+
+// 👇 هذا الفرق المهم
+if(name && from && msg && pass){
+    home.style.display="none";
+    view.style.display="block";
+    title.innerText=`🎁 مرحباً ${name} هدية من ${from}`;
+
+    window.data = {name, from, msg, pass};
+}
+
+// فتح الهدية
+function unlock(){
+    if(passInput.value !== window.data.pass){
+        alert("❌ كلمة السر غلط");
+        return;
+    }
+
+    content.innerHTML="💌 "+window.data.msg;
+}
+
+</script>
+
+</body>
+</html>    create.style.display="block";
 }
 
 // إنشاء رابط
