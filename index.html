@@ -2,64 +2,106 @@
 <html lang="ar">
 <head>
 <meta charset="UTF-8">
-<title>🎁 هدية فخمة</title>
+<title>🔥 Ultimate Gift</title>
 
 <style>
 body {
-    margin: 0;
+    margin:0;
     font-family: Arial;
-    background: linear-gradient(135deg, #ff9a9e, #fad0c4);
-    text-align: center;
-    color: white;
-    overflow: hidden;
+    text-align:center;
+    background: radial-gradient(circle,#1a1a1a,#000);
+    color:white;
+    overflow:hidden;
 }
 
-.container {
-    margin-top: 80px;
-}
-
+/* صندوق */
 .box {
-    background: rgba(255,255,255,0.2);
-    padding: 30px;
-    border-radius: 20px;
-    display: inline-block;
-    backdrop-filter: blur(15px);
+    margin-top:80px;
+    background:rgba(0,0,0,0.6);
+    padding:30px;
+    border-radius:20px;
+    display:inline-block;
+    backdrop-filter:blur(20px);
+    box-shadow:0 0 40px rgba(255,0,80,0.3);
 }
 
+/* الحقول */
 input, textarea {
-    width: 80%;
-    padding: 10px;
-    margin: 10px;
-    border: none;
-    border-radius: 10px;
+    width:80%;
+    padding:10px;
+    margin:10px;
+    border:none;
+    border-radius:10px;
 }
 
+/* زر احترافي */
 button {
-    padding: 10px 20px;
+    position: relative;
+    padding: 12px 25px;
+    margin: 10px;
+    font-size: 16px;
+    color: white;
+    background: linear-gradient(45deg,#ff0040,#ff4b2b);
     border: none;
-    border-radius: 10px;
-    background: white;
-    color: #ff4b5c;
+    border-radius: 12px;
     cursor: pointer;
+    overflow: hidden;
+    transition: 0.3s;
+    box-shadow: 0 0 15px #ff0040;
 }
 
-.hidden { display: none; }
-
-#giftMessage {
-    font-size: 24px;
-    margin-top: 20px;
+button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 30px #ff0040, 0 0 60px #ff4b2b;
 }
 
+button:active {
+    transform: scale(0.9);
+}
+
+button::before {
+    content:"";
+    position:absolute;
+    top:0;
+    left:-100%;
+    width:100%;
+    height:100%;
+    background:linear-gradient(120deg,transparent,rgba(255,255,255,0.7),transparent);
+}
+
+button:hover::before {
+    left:100%;
+    transition:0.5s;
+}
+
+/* زر خاص */
+.special {
+    background: linear-gradient(45deg,#00f2fe,#4facfe);
+    box-shadow:0 0 25px #00f2fe;
+}
+
+/* قلوب */
 .heart {
-    position: absolute;
-    color: red;
-    font-size: 20px;
-    animation: float 4s linear infinite;
+    position:absolute;
+    animation:float 4s linear infinite;
+}
+@keyframes float {
+    0%{transform:translateY(0);}
+    100%{transform:translateY(-800px);opacity:0;}
 }
 
-@keyframes float {
-    0% { transform: translateY(0); opacity:1; }
-    100% { transform: translateY(-800px); opacity:0; }
+/* كونفتي */
+.confetti {
+    position:absolute;
+    width:6px;
+    height:6px;
+    background:white;
+}
+
+/* نص */
+#content {
+    margin-top:20px;
+    font-size:22px;
 }
 </style>
 </head>
@@ -68,108 +110,120 @@ button {
 
 <audio id="music" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
 
-<div id="home" class="container">
-    <div class="box">
-        <h1>🌸 مرحباً</h1>
-        <button onclick="showCreate()">إنشاء هدية</button>
-    </div>
+<div id="home" class="box">
+    <h1>🔥 Ultimate Gift</h1>
+    <button onclick="goCreate()">إنشاء هدية</button>
 </div>
 
-<div id="create" class="container hidden">
-    <div class="box">
-        <h2>🎁 إنشاء هدية</h2>
-        <input id="sender" placeholder="اسمك">
-        <input id="receiver" placeholder="اسم المستلم">
-        <textarea id="desc" placeholder="رسالة الهدية"></textarea>
-        <br>
-        <button onclick="generateLink()">إنشاء رابط</button>
-        <div id="linkBox"></div>
-    </div>
+<div id="create" class="box hidden">
+    <h2>🎁 إنشاء</h2>
+    <input id="sender" placeholder="اسمك">
+    <input id="receiver" placeholder="اسم المستلم">
+    <input id="pass" placeholder="كلمة سر">
+    <input id="img" placeholder="رابط صورة">
+    <textarea id="msg" placeholder="رسالة"></textarea>
+    <button onclick="makeLink()">إنشاء رابط</button>
+    <div id="linkBox"></div>
 </div>
 
-<div id="view" class="container hidden">
-    <div class="box">
-        <h1 id="welcomeText"></h1>
-        <button onclick="openGift()">🎀 فتح الهدية</button>
-        <div id="giftMessage"></div>
-    </div>
+<div id="view" class="box hidden">
+    <h2 id="title"></h2>
+    <input id="passInput" placeholder="كلمة السر">
+    <button class="special" onclick="unlock()">🎀 فتح الهدية</button>
+    <div id="content"></div>
 </div>
 
 <script>
-// عرض صفحة الإنشاء
-function showCreate(){
+
+function goCreate(){
     home.classList.add("hidden");
     create.classList.remove("hidden");
 }
 
-// توليد الرابط
-function generateLink(){
-    let s = sender.value;
-    let r = receiver.value;
-    let d = desc.value;
-
-    if(!s || !r || !d){
-        alert("املأ كل الحقول 😅");
-        return;
-    }
-
+function makeLink(){
     let url = location.origin + location.pathname +
-    `?name=${encodeURIComponent(r)}&from=${encodeURIComponent(s)}&msg=${encodeURIComponent(d)}`;
+    `?name=${receiver.value}&from=${sender.value}&msg=${encodeURIComponent(msg.value)}&pass=${pass.value}&img=${img.value}`;
 
-    linkBox.innerHTML = `
-    <input value="${url}" readonly style="width:90%"><br><br>
-    <button onclick="navigator.clipboard.writeText('${url}')">نسخ الرابط</button>
-    `;
+    linkBox.innerHTML = `<input value="${url}" style="width:90%" readonly>
+    <br><button onclick="navigator.clipboard.writeText('${url}')">نسخ</button>`;
 }
 
-// قراءة الرابط
-function getParams(){
-    let p = new URLSearchParams(location.search);
+function params(){
+    let p=new URLSearchParams(location.search);
     return {
-        sender: p.get("from"),
-        receiver: p.get("name"),
-        desc: p.get("msg")
+        n:p.get("name"),
+        f:p.get("from"),
+        m:p.get("msg"),
+        pass:p.get("pass"),
+        img:p.get("img")
     };
 }
 
-// عند فتح الموقع
-window.onload = ()=>{
-    let d = getParams();
-    if(d.sender){
+window.onload=()=>{
+    let d=params();
+    if(d.n){
         home.classList.add("hidden");
         view.classList.remove("hidden");
-        welcomeText.innerText = `🎁 مرحباً ${d.receiver}، هدية من ${d.sender}`;
-        window.msg = d.desc;
+        title.innerText=`🎁 مرحباً ${d.n} هدية من ${d.f}`;
+        window.data=d;
     }
 };
 
-// فتح الهدية
-function openGift(){
+function unlock(){
+    if(passInput.value !== window.data.pass){
+        alert("❌ كلمة السر غلط");
+        return;
+    }
+
     music.play();
 
-    // كتابة تدريجية
-    let text = "💌 " + window.msg;
-    let i = 0;
-    giftMessage.innerHTML = "";
+    content.innerHTML="";
 
-    let type = setInterval(()=>{
-        giftMessage.innerHTML += text[i];
+    if(window.data.img){
+        content.innerHTML += `<img src="${window.data.img}" width="200"><br>`;
+    }
+
+    let text="💌 "+window.data.m;
+    let i=0;
+
+    let t=setInterval(()=>{
+        content.innerHTML += text[i];
         i++;
-        if(i >= text.length) clearInterval(type);
-    }, 50);
+        if(i>=text.length) clearInterval(t);
+    },40);
 
-    // قلوب
-    for(let i=0;i<30;i++){
-        let h = document.createElement("div");
-        h.className = "heart";
-        h.innerHTML = "❤️";
-        h.style.left = Math.random()*100 + "%";
-        h.style.top = "100%";
+    hearts();
+    confetti();
+}
+
+function hearts(){
+    for(let i=0;i<40;i++){
+        let h=document.createElement("div");
+        h.className="heart";
+        h.innerHTML="❤️";
+        h.style.left=Math.random()*100+"%";
+        h.style.top="100%";
         document.body.appendChild(h);
-
         setTimeout(()=>h.remove(),4000);
     }
 }
+
+function confetti(){
+    for(let i=0;i<100;i++){
+        let c=document.createElement("div");
+        c.className="confetti";
+        c.style.left=Math.random()*100+"%";
+        c.style.top="0";
+        document.body.appendChild(c);
+
+        let fall=setInterval(()=>{
+            c.style.top=(parseInt(c.style.top)+5)+"px";
+        },20);
+
+        setTimeout(()=>{clearInterval(fall);c.remove();},2000);
+    }
+}
+
 </script>
 
 </body>
