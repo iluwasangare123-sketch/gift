@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>🎁 هدية إلكترونية</title>
+<style>
+body {
+    font-family: Arial;
+    margin: 0;
+    background: linear-gradient(135deg, #ff9a9e, #ffc3a0);
+    text-align: center;
+    color: #fff;
+}
+
+.container {
+    margin-top: 80px;
+}
+
+.box {
+    background: rgba(255,255,255,0.2);
+    padding: 25px;
+    border-radius: 20px;
+    display: inline-block;
+    backdrop-filter: blur(10px);
+}
+
+input, textarea {
+    width: 80%;
+    padding: 10px;
+    margin: 10px;
+    border: none;
+    border-radius: 10px;
+}
+
+button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    background: #fff;
+    color: #ff4b5c;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.hidden {
+    display: none;
+}
+
+h1 {
+    font-size: 28px;
+}
+
+#giftMessage {
+    font-size: 22px;
+    margin-top: 20px;
+    animation: pop 1s ease;
+}
+
+@keyframes pop {
+    from {transform: scale(0);}
+    to {transform: scale(1);}
+}
+</style>
+</head>
+
+<body>
+
+<!-- الصفحة الرئيسية -->
+<div id="home" class="container">
+    <div class="box">
+        <h1>🌸 مرحباً بك</h1>
+        <p>اصنع هدية وشاركها 💝</p>
+        <button onclick="showCreate()">إنشاء هدية</button>
+    </div>
+</div>
+
+<!-- صفحة الإنشاء -->
+<div id="create" class="container hidden">
+    <div class="box">
+        <h1>🎁 إنشاء هدية</h1>
+        <input type="text" id="sender" placeholder="اسمك">
+        <input type="text" id="receiver" placeholder="اسم المستلم">
+        <textarea id="desc" placeholder="اكتب رسالة الهدية"></textarea>
+        <br>
+        <button onclick="generateLink()">إنشاء رابط</button>
+
+        <div id="linkBox" style="margin-top:15px;"></div>
+    </div>
+</div>
+
+<!-- صفحة العرض -->
+<div id="view" class="container hidden">
+    <div class="box">
+        <h1 id="welcomeText"></h1>
+        <button onclick="openGift()">🎀 فتح الهدية</button>
+        <div id="giftMessage"></div>
+    </div>
+</div>
+
+<script>
+// إظهار صفحة الإنشاء
+function showCreate() {
+    document.getElementById("home").classList.add("hidden");
+    document.getElementById("create").classList.remove("hidden");
+}
+
+// توليد الرابط
+function generateLink() {
+    let sender = document.getElementById("sender").value;
+    let receiver = document.getElementById("receiver").value;
+    let desc = document.getElementById("desc").value;
+
+    if (!sender || !receiver || !desc) {
+        alert("املأ كل الحقول 😅");
+        return;
+    }
+
+    let url = window.location.origin + window.location.pathname +
+        "?name=" + encodeURIComponent(receiver) +
+        "&from=" + encodeURIComponent(sender) +
+        "&msg=" + encodeURIComponent(desc);
+
+    document.getElementById("linkBox").innerHTML =
+        "<p>🔗 رابط الهدية:</p>" +
+        "<input value='" + url + "' readonly style='width:90%'><br><br>" +
+        "<button onclick='copyLink(\"" + url + "\")'>نسخ الرابط</button>";
+}
+
+// نسخ الرابط
+function copyLink(link) {
+    navigator.clipboard.writeText(link);
+    alert("تم نسخ الرابط 📋");
+}
+
+// قراءة الرابط
+function getParams() {
+    let params = new URLSearchParams(window.location.search);
+    return {
+        sender: params.get("from"),
+        receiver: params.get("name"),
+        desc: params.get("msg")
+    };
+}
+
+// عند فتح الصفحة
+window.onload = function() {
+    let data = getParams();
+
+    if (data.sender && data.receiver && data.desc) {
+        document.getElementById("home").classList.add("hidden");
+        document.getElementById("view").classList.remove("hidden");
+
+        document.getElementById("welcomeText").innerText =
+            "🎁 مرحباً " + data.receiver + "، لديك هدية من " + data.sender;
+
+        window.giftDesc = data.desc;
+    }
+};
+
+// فتح الهدية
+function openGift() {
+    document.getElementById("giftMessage").innerHTML =
+        "🎉 تم فتح الهدية 🎉<br><br>💌 " + window.giftDesc;
+}
+</script>
+
+</body>
+</html>
