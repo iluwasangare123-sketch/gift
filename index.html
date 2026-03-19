@@ -9,18 +9,20 @@ body {
     margin:0;
     font-family: Arial;
     text-align:center;
-    background:#111;
+    background:#0f0f0f;
     color:white;
 }
 
+/* صندوق */
 .box {
     margin-top:80px;
-    background:#222;
+    background:#1e1e1e;
     padding:30px;
-    border-radius:20px;
+    border-radius:15px;
     display:inline-block;
 }
 
+/* أزرار */
 button {
     padding:12px 25px;
     margin:10px;
@@ -39,15 +41,17 @@ input,textarea {
     border:none;
 }
 </style>
-
 </head>
+
 <body>
 
+<!-- الرئيسية -->
 <div id="home" class="box">
     <h1>🔥 Ultimate Gift</h1>
     <button onclick="goCreate()">إنشاء هدية</button>
 </div>
 
+<!-- إنشاء -->
 <div id="create" class="box" style="display:none;">
     <h2>🎁 إنشاء</h2>
     <input id="sender" placeholder="اسمك"><br>
@@ -58,156 +62,78 @@ input,textarea {
     <div id="linkBox"></div>
 </div>
 
+<!-- عرض -->
 <div id="view" class="box" style="display:none;">
     <h2 id="title"></h2>
     <input id="passInput" placeholder="كلمة السر"><br>
-    <button onclick="unlock()">🎀 فتح الهدية</button>
+    <button onclick="unlock()">فتح الهدية</button>
     <div id="content"></div>
 </div>
 
 <script>
 
+// تحويل لصفحة الإنشاء
 function goCreate(){
-    home.style.display="none";
-    create.style.display="block";
+    document.getElementById("home").style.display="none";
+    document.getElementById("create").style.display="block";
 }
 
+// إنشاء الرابط
 function makeLink(){
-    let url = location.origin + location.pathname +
-    `?name=${receiver.value}&from=${sender.value}&msg=${encodeURIComponent(msg.value)}&pass=${pass.value}`;
+    let sender = document.getElementById("sender").value;
+    let receiver = document.getElementById("receiver").value;
+    let msg = document.getElementById("msg").value;
+    let pass = document.getElementById("pass").value;
 
-    linkBox.innerHTML = `<input value="${url}" style="width:90%" readonly>`;
+    if(!sender || !receiver || !msg || !pass){
+        alert("املأ كل الحقول");
+        return;
+    }
+
+    let url = window.location.origin + window.location.pathname +
+    `?name=${encodeURIComponent(receiver)}&from=${encodeURIComponent(sender)}&msg=${encodeURIComponent(msg)}&pass=${encodeURIComponent(pass)}`;
+
+    document.getElementById("linkBox").innerHTML =
+    `<input value="${url}" style="width:90%" readonly>`;
 }
 
 // قراءة الرابط
 let params = new URLSearchParams(window.location.search);
 
-// تحقق صارم
 let name = params.get("name");
 let from = params.get("from");
 let msg = params.get("msg");
 let pass = params.get("pass");
 
-// 👇 هذا الفرق المهم
-if(name && from && msg && pass){
-    home.style.display="none";
-    view.style.display="block";
-    title.innerText=`🎁 مرحباً ${name} هدية من ${from}`;
+// تحقق قوي (هذا أهم شي)
+if(name !== null && from !== null && msg !== null && pass !== null){
 
-    window.data = {name, from, msg, pass};
+    document.getElementById("home").style.display="none";
+    document.getElementById("view").style.display="block";
+
+    document.getElementById("title").innerText =
+    `🎁 مرحباً ${name} هدية من ${from}`;
+
+    // نخزن البيانات
+    window.giftData = {msg, pass};
 }
 
 // فتح الهدية
 function unlock(){
-    if(passInput.value !== window.data.pass){
+    if(!window.giftData){
+        alert("لا توجد هدية");
+        return;
+    }
+
+    let inputPass = document.getElementById("passInput").value;
+
+    if(inputPass !== window.giftData.pass){
         alert("❌ كلمة السر غلط");
         return;
     }
 
-    content.innerHTML="💌 "+window.data.msg;
-}
-
-</script>
-
-</body>
-</html>    create.style.display="block";
-}
-
-// إنشاء رابط
-function makeLink(){
-    let url = location.origin + location.pathname +
-    `?name=${receiver.value}&from=${sender.value}&msg=${encodeURIComponent(msg.value)}&pass=${pass.value}`;
-
-    linkBox.innerHTML = `<input value="${url}" style="width:90%" readonly>`;
-}
-
-// قراءة الرابط
-let p=new URLSearchParams(location.search);
-let data={
-    n:p.get("name"),
-    f:p.get("from"),
-    m:p.get("msg"),
-    pass:p.get("pass")
-};
-
-// عرض الهدية
-if(data.n){
-    home.style.display="none";
-    view.style.display="block";
-    title.innerText=`🎁 مرحباً ${data.n} هدية من ${data.f}`;
-}
-
-// فتح
-function unlock(){
-    if(passInput.value !== data.pass){
-        alert("❌ كلمة السر غلط");
-        return;
-    }
-
-    let i=3;
-    count.innerHTML="⏳ "+i;
-
-    let timer=setInterval(()=>{
-        i--;
-        count.innerHTML="⏳ "+i;
-
-        if(i==0){
-            clearInterval(timer);
-            openGift();
-        }
-    },1000);
-}
-
-// عرض الهدية
-function openGift(){
-    music.play();
-
-    content.innerHTML="";
-
-    let text="💌 "+data.m;
-    let i=0;
-
-    let t=setInterval(()=>{
-        content.innerHTML+=text[i];
-        i++;
-        if(i>=text.length) clearInterval(t);
-    },40);
-
-    hearts();
-    confetti();
-}
-
-// قلوب
-function hearts(){
-    for(let i=0;i<30;i++){
-        let h=document.createElement("div");
-        h.className="heart";
-        h.innerHTML="❤️";
-        h.style.left=Math.random()*100+"%";
-        h.style.top="100%";
-        document.body.appendChild(h);
-        setTimeout(()=>h.remove(),4000);
-    }
-}
-
-// كونفتي
-function confetti(){
-    for(let i=0;i<80;i++){
-        let c=document.createElement("div");
-        c.style.position="absolute";
-        c.style.width="5px";
-        c.style.height="5px";
-        c.style.background="white";
-        c.style.left=Math.random()*100+"%";
-        c.style.top="0";
-        document.body.appendChild(c);
-
-        let fall=setInterval(()=>{
-            c.style.top=(parseInt(c.style.top)+5)+"px";
-        },20);
-
-        setTimeout(()=>{clearInterval(fall);c.remove();},2000);
-    }
+    document.getElementById("content").innerHTML =
+    "💌 " + window.giftData.msg;
 }
 
 </script>
