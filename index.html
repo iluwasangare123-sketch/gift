@@ -2,7 +2,7 @@
 <html lang="ar">
 <head>
 <meta charset="UTF-8">
-<title>🔥 Ultimate Gift X</title>
+<title>🔥 Ultimate Gift Pro</title>
 
 <style>
 body {
@@ -10,8 +10,7 @@ body {
     font-family: Arial;
     text-align:center;
     color:white;
-    overflow:hidden;
-    background: linear-gradient(270deg,#ff0040,#ff7300,#ff00c8);
+    background: linear-gradient(270deg,#ff0040,#000,#ff7300);
     background-size:600% 600%;
     animation:bg 10s infinite;
 }
@@ -24,16 +23,15 @@ body {
 
 .box {
     margin-top:80px;
-    background:rgba(0,0,0,0.4);
+    background:rgba(0,0,0,0.5);
     padding:30px;
     border-radius:20px;
-    backdrop-filter:blur(20px);
     display:inline-block;
+    backdrop-filter:blur(15px);
 }
 
-/* أزرار */
+/* أزرار فخمة */
 button {
-    position:relative;
     padding:12px 25px;
     margin:10px;
     border:none;
@@ -41,101 +39,77 @@ button {
     background:linear-gradient(45deg,#ff0040,#ff4b2b);
     color:white;
     cursor:pointer;
-    overflow:hidden;
-}
-
-button:active {
-    transform:scale(0.9);
-}
-
-/* ripple */
-button::after {
-    content:"";
-    position:absolute;
-    width:0;
-    height:0;
-    border-radius:50%;
-    background:rgba(255,255,255,0.5);
-    transform:translate(-50%,-50%);
-    top:50%; left:50%;
-}
-
-button:active::after {
-    width:200px;
-    height:200px;
+    box-shadow:0 0 15px #ff0040;
     transition:0.3s;
 }
 
-/* shake */
-.shake {
-    animation:shake 0.3s;
-}
-@keyframes shake {
-    0%{transform:translateX(0)}
-    25%{transform:translateX(-5px)}
-    50%{transform:translateX(5px)}
-    75%{transform:translateX(-5px)}
+button:hover {
+    transform:scale(1.1);
+    box-shadow:0 0 30px #ff0040;
 }
 
-/* flash */
-.flash {
-    position:fixed;
-    width:100%;
-    height:100%;
-    background:white;
-    top:0;
-    left:0;
-    opacity:0;
+input,textarea {
+    width:80%;
+    padding:10px;
+    margin:10px;
+    border:none;
+    border-radius:10px;
+}
+
+/* قلوب */
+.heart {
+    position:absolute;
+    animation:float 4s linear infinite;
+}
+@keyframes float {
+    0%{transform:translateY(0);}
+    100%{transform:translateY(-800px);opacity:0;}
 }
 </style>
 
 </head>
 <body>
 
-<audio id="clickSound" src="https://www.soundjay.com/buttons/sounds/button-16.mp3"></audio>
 <audio id="music" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
 
-<div id="createPage" class="box" style="display:none;">
-<h2>🎁 إنشاء هدية</h2>
-<input id="sender" placeholder="اسمك"><br>
-<input id="receiver" placeholder="اسم المستلم"><br>
-<input id="pass" placeholder="كلمة سر"><br>
-<input id="img" placeholder="رابط صورة"><br>
-<textarea id="msg" placeholder="رسالة"></textarea><br>
-<button onclick="makeLink()">إنشاء رابط</button>
-<div id="linkBox"></div>
+<!-- الصفحة الرئيسية -->
+<div id="home" class="box">
+    <h1>🔥 Ultimate Gift</h1>
+    <button onclick="goCreate()">إنشاء هدية</button>
 </div>
 
-<div id="viewPage" class="box" style="display:none;">
-<h2 id="title"></h2>
-<input id="passInput" placeholder="كلمة السر"><br>
-<button onclick="unlock()">🎀 فتح الهدية</button>
-<div id="count"></div>
-<div id="content"></div>
+<!-- الإنشاء -->
+<div id="create" class="box" style="display:none;">
+    <h2>🎁 إنشاء هدية</h2>
+    <input id="sender" placeholder="اسمك"><br>
+    <input id="receiver" placeholder="اسم المستلم"><br>
+    <input id="pass" placeholder="كلمة سر"><br>
+    <textarea id="msg" placeholder="رسالة"></textarea><br>
+    <button onclick="makeLink()">إنشاء رابط</button>
+    <div id="linkBox"></div>
 </div>
 
-<div id="flash" class="flash"></div>
+<!-- العرض -->
+<div id="view" class="box" style="display:none;">
+    <h2 id="title"></h2>
+    <input id="passInput" placeholder="كلمة السر"><br>
+    <button onclick="unlock()">🎀 فتح الهدية</button>
+    <div id="count"></div>
+    <div id="content"></div>
+</div>
 
 <script>
 
-function playClick(){
-    clickSound.play();
-    if(navigator.vibrate) navigator.vibrate(50);
+// انتقال
+function goCreate(){
+    home.style.display="none";
+    create.style.display="block";
 }
 
-// تحديد الصفحة
-if(location.pathname.includes("create")){
-    createPage.style.display="block";
-}else{
-    viewPage.style.display="block";
-}
-
-// إنشاء الرابط
+// إنشاء رابط
 function makeLink(){
-    playClick();
-
-    let url = location.origin + location.pathname.replace("create","") +
-    `?name=${receiver.value}&from=${sender.value}&msg=${encodeURIComponent(msg.value)}&pass=${pass.value}&img=${img.value}`;
+    let url = location.origin + location.pathname +
+    `?name=${receiver.value}&from=${sender.value}&msg=${encodeURIComponent(msg.value)}&pass=${pass.value}`;
 
     linkBox.innerHTML = `<input value="${url}" style="width:90%" readonly>`;
 }
@@ -146,30 +120,30 @@ let data={
     n:p.get("name"),
     f:p.get("from"),
     m:p.get("msg"),
-    pass:p.get("pass"),
-    img:p.get("img")
+    pass:p.get("pass")
 };
 
+// عرض الهدية
 if(data.n){
+    home.style.display="none";
+    view.style.display="block";
     title.innerText=`🎁 مرحباً ${data.n} هدية من ${data.f}`;
 }
 
-// فتح الهدية
+// فتح
 function unlock(){
-    playClick();
-
     if(passInput.value !== data.pass){
-        passInput.classList.add("shake");
-        setTimeout(()=>passInput.classList.remove("shake"),300);
+        alert("❌ كلمة السر غلط");
         return;
     }
 
-    // عداد
     let i=3;
     count.innerHTML="⏳ "+i;
+
     let timer=setInterval(()=>{
         i--;
         count.innerHTML="⏳ "+i;
+
         if(i==0){
             clearInterval(timer);
             openGift();
@@ -177,33 +151,41 @@ function unlock(){
     },1000);
 }
 
+// عرض الهدية
 function openGift(){
     music.play();
 
-    // فلاش
-    flash.style.opacity=1;
-    setTimeout(()=>flash.style.opacity=0,300);
-
-    // رسالة
     content.innerHTML="";
-    if(data.img){
-        content.innerHTML+=`<img src="${data.img}" width="200"><br>`;
-    }
 
     let text="💌 "+data.m;
     let i=0;
+
     let t=setInterval(()=>{
         content.innerHTML+=text[i];
         i++;
         if(i>=text.length) clearInterval(t);
     },40);
 
+    hearts();
     confetti();
+}
+
+// قلوب
+function hearts(){
+    for(let i=0;i<30;i++){
+        let h=document.createElement("div");
+        h.className="heart";
+        h.innerHTML="❤️";
+        h.style.left=Math.random()*100+"%";
+        h.style.top="100%";
+        document.body.appendChild(h);
+        setTimeout(()=>h.remove(),4000);
+    }
 }
 
 // كونفتي
 function confetti(){
-    for(let i=0;i<120;i++){
+    for(let i=0;i<80;i++){
         let c=document.createElement("div");
         c.style.position="absolute";
         c.style.width="5px";
